@@ -320,7 +320,7 @@ def add_file(dataset, registry, json_file, output_path):
             file_err(err_msg, dataset, json_file)
             return
 
-    # TODO: remove all implementation
+    # TODO: remove old implementation
     # if link_data_only == 'copy_files' and dataset.type in ('server_dir', 'path_paste') and data_type not in ['gzip',
     #                                                                                                          'bz2',
     #                                                                                                          'zip']:
