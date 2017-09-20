@@ -30,35 +30,8 @@ _FILE_TYPE_PREFIX = {
 _MAX_LEN_FILE_TYPE_PREFIX = max(len(x) for x in _FILE_TYPE_PREFIX)
 _FILE_TYPE_REGEX = re.compile("(%s)" % "|".join(map(re.escape, _FILE_TYPE_PREFIX.keys())))
 
-
-class Logger(object):
-    """ A simple logger which directly outputs messages to the stdout/stderr streams """
-
-    def __init__(self):
-        super(Logger, self).__init__()
-        self._level = logging.INFO
-
-    def set_level(self, level):
-        self._level = level
-
-    def info(self, message):
-        print("INFO: %s" % message)
-
-    def warn(self, message):
-        print("WARN: %s" % message)
-
-    def debug(self, message):
-        if self._level == logging.DEBUG:
-            print("DEBUG: %s" % message)
-
-    def error(self, message):
-        print("ERROR: %s" % message, file=sys.stderr)
-
-
 # global logger
-logger = Logger()
-logger.set_level(logging.DEBUG)
-
+logger = logging.getLogger(__name__)
 
 class Isa(data.Data):
     """ Base class for implementing ISA datatypes """
@@ -72,13 +45,17 @@ class Isa(data.Data):
     #                          readonly=True, set_in_upload=True)
 
     def __init__(self, **kwd):
+        logger.info("Isa::__init__ 01")
         data.Data.__init__(self, **kwd)
+        logger.info("Isa::__init__ 02")
 
     def get_primary_filename(self, files_list):
         """ Return the investigation filename """
+        logger.info("Isa::get_primary_filename 01")
         raise NotImplementedError()
 
     def _extract_archive(self, stream):
+        logger.info("Isa::_extract_archive 01")
         # extract the archive to a temp folder
         tmp_folder = tempfile.mkdtemp()
         # try to detect the type of the compressed archive
@@ -94,6 +71,7 @@ class Isa(data.Data):
         return tmp_folder
 
     def _list_archive_files(self, stream):
+        logger.info("Isa::_list_archive_files 01")
         # try to detect the type of the compressed archive
         a_type = self._detect_file_type(stream)
         # decompress the archive
@@ -123,6 +101,7 @@ class Isa(data.Data):
         return files_list
 
     def write_from_stream(self, dataset, stream):
+        logger.info("Isa::write_from_stream 01")
         # Extract archive to a temporary folder
         tmp_folder = self._extract_archive(stream)
         # Copy all files of the uncompressed archive to their final destination
@@ -146,6 +125,7 @@ class Isa(data.Data):
         logger.info("Primary file '%s' saved!" % primary_filename)
 
     def _detect_file_type(self, stream):
+        logger.info("Isa::_detect_file_type 01")
         """
         Try to detect the type of the dataset archive.
 
@@ -162,17 +142,20 @@ class Isa(data.Data):
         return file_type
 
     def _extract_zip_archive(self, stream, target_path):
+        logger.info("Isa::_extract_zip_archive 01")
         logger.debug("Decompressing the ZIP archive")
         data = BytesIO(stream.read())
         zip_ref = zipfile.ZipFile(data)
         zip_ref.extractall(path=target_path)
 
     def _extract_tar_archive(self, stream, target_path):
+        logger.info("Isa::_extract_tar_archive 01")
         logger.debug("Decompressing the TAR archive")
         with tarfile.open(fileobj=stream) as tar:
             tar.extractall(path=target_path)
 
     def generate_primary_file(self, dataset=None):
+        logger.info("Isa::generate_primary_file 01")
         logger.debug("Dataset type: %s, keys=%s, values=%s", type(dataset), dataset.keys(), dataset.values())
 
         rval = ['<html><head><title>Wiff Composite Dataset </title></head><p/>']
@@ -199,6 +182,7 @@ class Isa(data.Data):
         :param filename: the name of the file containing the uploaded archive
         :return:
         """
+        logger.info("Isa::sniff 01")
         logger.info("Checking if it is an ISA: %s" % filename)
         # get the list of files within the compressed archive
         with open(filename, 'rb') as stream:
@@ -218,6 +202,7 @@ class IsaTab(Isa):
     def get_primary_filename(self, files_list):
         """ Use the `investigation` file as primary file"""
         # TODO: check pattern to identify the investigation file
+        logger.info("IsaTab::get_primary_filename 01")
         investigation_file_pattern = re.compile(fnmatch.translate("i_*.txt"))
         res = [l for l in files_list if investigation_file_pattern.match(l)]
         if len(res) > 0:
@@ -228,6 +213,7 @@ class IsaTab(Isa):
         return None
 
     def validate(self, dataset):
+        logger.info("IsaTab::validate 01")
         # TODO: implement a validator function
         logger.debug("Validating dataset....")
         return super(Isa, self).validate(dataset)
@@ -239,6 +225,7 @@ class IsaJson(Isa):
 
     def get_primary_filename(self, files_list):
         """ Use the `investigation` file as primary file"""
+        logger.info("IsaJson::get_primary_filename 01")
         res = [f for f in files_list if f.endswith(".json")]
         if len(res) > 0:
             if len(res) == 1:
