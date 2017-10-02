@@ -36,7 +36,7 @@ logger = logging.getLogger(__name__)
 class Isa(data.Data):
     """ Base class for implementing ISA datatypes """
     file_ext = "isa"
-    composite_type = 'basic'  # 'auto_primary_file'
+    composite_type = 'auto_primary_file'
     allow_datatype_change = False
     is_binary = True
 
