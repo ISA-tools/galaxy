@@ -199,6 +199,11 @@ class IsaTab(Isa):
     """ Class which implements the ISA-Tab datatype """
     file_ext = "isa-tab"
 
+    def __init__(self, **kwd):
+        logger.info("IsaTab::__init__ 01")
+	super(self.__class__, self).__init__(**kwd)
+        logger.info("IsaTab::__init__ 02")
+
     def get_primary_filename(self, files_list):
         """ Use the `investigation` file as primary file"""
         # TODO: check pattern to identify the investigation file
@@ -222,6 +227,11 @@ class IsaTab(Isa):
 class IsaJson(Isa):
     """ Class which implements the ISA-JSON datatype """
     file_ext = "isa-json"
+
+    def __init__(self, **kwd):
+        logger.info("IsaJson::__init__ 01")
+	super(self.__class__, self).__init__(**kwd)
+        logger.info("IsaJson::__init__ 02")
 
     def get_primary_filename(self, files_list):
         """ Use the `investigation` file as primary file"""
