@@ -60,13 +60,16 @@ class Isa(data.Data):
         tmp_folder = tempfile.mkdtemp()
         # try to detect the type of the compressed archive
         a_type = self._detect_file_type(stream)
+        if a_type is None:
+            raise Exception('Unknown archive type when trying to decrompress ISA-Tab/Json data bundle.')
+            
         # decompress the archive
         if a_type == "zip":
             self._extract_zip_archive(stream, tmp_folder)
         elif a_type == "gz":
             self._extract_tar_archive(stream, tmp_folder)
         else:
-            raise Exception("Not supported archive format!!!")
+            raise Exception('Archive format "' + a_type + '" is not supported!')
 
         return tmp_folder
 
